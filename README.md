@@ -1,475 +1,258 @@
-Experiment: Push-Button-Controlled Buzzer and Speaker Using AT89C51
-1. Aim
+# Design-and-Implementation-of-an-Eight-LED-Sequential-Lighting-System-Using-AT89C51-Microcontroller
+Design and Implementation of an Eight-LED Sequential Lighting System Using AT89C51 Microcontroller using Proteus
+##  Overview
 
-To interface a push button, buzzer, and speaker with the AT89C51 microcontroller and activate the buzzer and speaker when the push button is pressed.
+This project presents the **design and implementation of an eight-LED sequential lighting system using the AT89C51 microcontroller**.
 
-2. Objective
-To understand the basic operation of the AT89C51 8051 microcontroller.
-To interface a push button as a digital input.
-To interface a buzzer and speaker as output devices.
-To control the buzzer and speaker using an NPN BC547 transistor.
-To write and execute an Embedded C program for monitoring the push button.
-To understand switch debouncing using a small software delay.
-To observe the ON/OFF operation of the audible indicators.
-3. Components Required
-S.No.	Component	Specification	Quantity
-1	Microcontroller	AT89C51	1
-2	Push button	Normally Open	2
-3	Buzzer	5 V	1
-4	Speaker	Low-power speaker	1
-5	NPN Transistor	BC547	1
-6	Base Resistor	330 Ω	1
-7	Pull-down Resistor	10 kΩ	1
-8	Reset Resistor	10 kΩ	1
-9	Capacitor	0.1 µF	1
-10	Power Supply	Regulated +5 V DC	1
-11	Crystal Oscillator	Suitable 8051 crystal	1
-12	Connecting Wires	—	As required
+Eight LEDs are interfaced with **Port 2 (P2.0–P2.7)** of the AT89C51. The microcontroller controls the LEDs such that they glow one after another with a predefined time delay, producing a **running LED effect**.
 
-The component values above are based on the repository's circuit description.
+The project demonstrates basic concepts of **8051 microcontroller programming, GPIO interfacing, bit manipulation, and software delay generation**.
 
-4. Theory
-4.1 AT89C51 Microcontroller
+---
 
-The AT89C51 is an 8-bit microcontroller based on the 8051 architecture. It contains programmable I/O ports that can be configured for interfacing switches, LEDs, buzzers, displays, motors and other peripherals.
+##  Objectives
 
-In this experiment:
+* To interface eight LEDs with the AT89C51 microcontroller.
+* To understand the operation of 8051 I/O ports.
+* To generate a sequential LED lighting pattern.
+* To implement software delay using Embedded C.
+* To understand bit shifting and port manipulation.
+* To simulate the circuit using Proteus.
 
-P1.2 is used as the push-button input.
-P3.2 is used as the control output for the transistor.
-The transistor acts as a switching device for the buzzer and speaker.
-4.2 Push Button
+---
 
-A push button is used to provide a digital input to the microcontroller.
+##  Hardware Requirements
 
-The push button is connected between +5 V and P1.2.
+| Component                      | Quantity    |
+| ------------------------------ | ----------- |
+| AT89C51 Microcontroller        | 1           |
+| LED                            | 8           |
+| Resistor 330 Ω                 | 8           |
+| Crystal Oscillator 11.0592 MHz | 1           |
+| Capacitor 33 pF                | 2           |
+| 5 V DC Power Supply            | 1           |
+| Breadboard                     | 1           |
+| Connecting Wires               | As required |
 
-A 10 kΩ pull-down resistor is connected between P1.2 and ground.
+---
+
+##  Software Requirements
+
+* **Keil µVision** – For Embedded C programming and HEX file generation
+* **Proteus** – For circuit simulation
+
+---
+
+##  Circuit Connections
+
+The eight LEDs are connected to **Port 2** of the AT89C51.
+```text
+AT89C51                    LED
+
+P2.0 ───── 330Ω ───── LED1
+P2.1 ───── 330Ω ───── LED2
+P2.2 ───── 330Ω ───── LED3
+P2.3 ───── 330Ω ───── LED4
+P2.4 ───── 330Ω ───── LED5
+P2.5 ───── 330Ω ───── LED6
+P2.6 ───── 330Ω ───── LED7
+P2.7 ───── 330Ω ───── LED8
+```
+
+Each LED is connected through a **330 Ω current-limiting resistor**.
+
+> **Note:** The program assumes an active-HIGH LED connection. If the hardware uses active-LOW logic, the LED patterns must be inverted.
+
+---
+
+##  Working Principle
+
+The AT89C51 sends an 8-bit pattern to **Port 2**. Only one bit is set at a time, causing one LED to glow.
+
+The sequence is:
+
+```text
+00000001 → 00000010 → 00000100 → 00001000
+     ↓
+00010000 → 00100000 → 01000000 → 10000000
+```
 
 Therefore:
 
-Button released → P1.2 = LOW
-Button pressed → P1.2 = HIGH
+```text
+LED1 → LED2 → LED3 → LED4 → LED5 → LED6 → LED7 → LED8
+```
 
-This allows the microcontroller to determine whether the button is pressed.
+After LED8, the sequence starts again from LED1.
 
-4.3 BC547 Transistor
+---
 
-The AT89C51 output pin is used to control a BC547 NPN transistor.
+##  Embedded C Program
 
-The transistor works as an electronic switch.
-
-When P3.2 = HIGH:
-
-Base current flows through the 330 Ω resistor.
-The BC547 turns ON.
-Current flows through the buzzer and speaker.
-The buzzer and speaker produce sound.
-
-When P3.2 = LOW:
-
-The transistor turns OFF.
-Current through the buzzer and speaker stops.
-The sound is switched OFF.
-
-The repository specifies the BC547 collector as the common connection to the negative terminals of the buzzer and speaker, with their positive terminals connected to +5 V.
-
-5. Pin Connections
-AT89C51 Pin/Port	Connection
-P1.2, Pin 3	Push-button input
-P3.2 / INT0, Pin 12	BC547 base through 330 Ω
-VCC, Pin 40	+5 V
-GND, Pin 20	Ground
-RST, Pin 9	Reset circuit
-BC547 emitter	Ground
-BC547 collector	Negative terminals of buzzer and speaker
-Buzzer +	+5 V
-Speaker +	+5 V
-P1.2	10 kΩ pull-down to GND
-
-The repository also notes that the AT89C51 requires a suitable clock circuit connected to XTAL1 and XTAL2.
-
-Simplified connection
-                 +5V
-                  |
-             Push Button
-                  |
-                  +-------- P1.2
-                  |
-                10kΩ
-                  |
-                 GND
-
-
-AT89C51                         BC547
---------                       -------
-P3.2 -------- 330Ω ----------> Base
-                                |
-                               |/
-                         GND --|   Collector
-                               |\
-                                |
-                                +------ Buzzer (-)
-                                |
-                                +------ Speaker (-)
-
-Buzzer (+) -------------------- +5V
-Speaker (+) ------------------- +5V
-Emitter ----------------------- GND
-
-Note: For an actual inductive/magnetic buzzer, a flyback diode should be provided across the load to protect the transistor.
-
-6. Working Principle
-The AT89C51 continuously monitors the push button connected to P1.2.
-A 10 kΩ pull-down resistor keeps P1.2 at LOW when the push button is released.
-When the push button is pressed, P1.2 receives +5 V.
-Therefore, P1.2 becomes HIGH.
-The microcontroller detects the HIGH input.
-The microcontroller makes P3.2 HIGH.
-The HIGH signal is applied to the base of the BC547 through a 330 Ω resistor.
-The BC547 switches ON.
-Current flows through the buzzer and speaker.
-The buzzer and speaker produce sound.
-When the push button is released, P1.2 becomes LOW.
-The microcontroller makes P3.2 LOW.
-The BC547 switches OFF.
-The buzzer and speaker stop producing sound.
-This process is continuously repeated.
-7. Algorithm
-Start.
-Initialize the microcontroller.
-Configure P1.2 as the push-button input.
-Configure P3.2 as the buzzer/speaker control output.
-Initially set P3.2 LOW.
-Read the state of P1.2.
-Check whether the push button is pressed.
-If P1.2 = HIGH, wait for approximately 20 ms for switch debouncing.
-Read P1.2 again.
-If P1.2 is still HIGH, make P3.2 HIGH.
-Switch ON the BC547 transistor.
-Activate the buzzer and speaker.
-If P1.2 = LOW, make P3.2 LOW.
-Switch OFF the BC547 transistor.
-Switch OFF the buzzer and speaker.
-Repeat the process continuously.
-8. Flowchart
-              ┌──────────────┐
-              │    START     │
-              └──────┬───────┘
-                     │
-                     ▼
-          ┌─────────────────────┐
-          │ Initialize P1.2 and │
-          │       P3.2          │
-          └──────────┬──────────┘
-                     │
-                     ▼
-          ┌─────────────────────┐
-          │ Read push button     │
-          │       P1.2           │
-          └──────────┬──────────┘
-                     │
-                     ▼
-                ┌─────────┐
-                │ P1.2=1? │
-                └───┬─┬───┘
-                  No│ │Yes
-                    │ │
-                    │ ▼
-                    │ ┌────────────────┐
-                    │ │ Delay 20 ms    │
-                    │ └───────┬────────┘
-                    │         │
-                    │         ▼
-                    │   ┌────────────┐
-                    │   │ P1.2 still │
-                    │   │ HIGH?      │
-                    │   └────┬───┬───┘
-                    │      No│   │Yes
-                    │        │   │
-                    │        │   ▼
-                    │        │ ┌─────────────┐
-                    │        │ │ P3.2 = HIGH │
-                    │        │ └──────┬──────┘
-                    │        │        │
-                    │        │        ▼
-                    │        │ ┌─────────────┐
-                    │        │ │ Buzzer and  │
-                    │        │ │ speaker ON  │
-                    │        │ └──────┬──────┘
-                    │        │        │
-                    ▼        ▼        │
-             ┌─────────────────┐      │
-             │   P3.2 = LOW    │◄─────┘
-             └────────┬────────┘
-                      │
-                      ▼
-             ┌─────────────────┐
-             │ Buzzer & speaker│
-             │      OFF        │
-             └────────┬────────┘
-                      │
-                      └──────► Repeat
-9. Embedded C Program
-
-The repository provides the following Embedded C program using reg51.h.
-
+```c
 #include <reg51.h>
 
-sbit BUTTON = P1^2;
-sbit BUZZER = P3^2;
-
-void delay_ms(unsigned int ms)
+void delay(void)
 {
-    unsigned int i, j;
+     unsigned int i, j;
 
-    for (i = 0; i < ms; i++)
+    for(i = 0; i < 500; i++)
     {
-        for (j = 0; j < 112; j++)
-        {
-            /* Approximate delay */
-        }
+        for(j = 0; j < 120; j++);
     }
 }
 
 void main(void)
 {
-    /* Configure the button pin as input */
-    BUTTON = 1;
+    unsigned char i;
 
-    /* Initially switch OFF the buzzer and speaker */
-    BUZZER = 0;
-
-    while (1)
+    while(1)
     {
-        /* Check whether the push button is pressed */
-        if (BUTTON == 1)
+        for(i = 0; i < 8; i++)
         {
-            /* Debouncing delay */
-            delay_ms(20);
-
-            if (BUTTON == 1)
-            {
-                /* Switch ON the buzzer and speaker */
-                BUZZER = 1;
-            }
-        }
-        else
-        {
-            /* Switch OFF the buzzer and speaker */
-            BUZZER = 0;
+            P2 = (1 << i);
+            delay();
         }
     }
 }
-10. Program Explanation
+```
+
+---
+
+## Program Explanation
+
+### Header File
+
+```c
 #include <reg51.h>
-#include <reg51.h>
+```
+This header file provides the definitions required to access the registers of the 8051 microcontroller.
 
-This includes the 8051 microcontroller register definitions required for accessing ports such as P1 and P3.
+### Port Configuration
 
-Button declaration
-sbit BUTTON = P1^2;
+Port 2 is used to control the eight LEDs.
 
-This assigns the name BUTTON to P1.2.
+```c
+P2 = (1 << i);
+```
 
-Buzzer declaration
-sbit BUZZER = P3^2;
+The expression shifts a single `1` bit from P2.0 toward P2.7.
 
-This assigns the name BUZZER to P3.2.
+### LED Sequence
 
-Although the variable is called BUZZER, this output actually controls the BC547, which switches both the buzzer and speaker.
+| Step | P2 Value | Binary     | LED  |
+| ---- | -------- | ---------- | ---- |
+| 1    | `01H`    | `00000001` | LED1 |
+| 2    | `02H`    | `00000010` | LED2 |
+| 3    | `04H`    | `00000100` | LED3 |
+| 4    | `08H`    | `00001000` | LED4 |
+| 5    | `10H`    | `00010000` | LED5 |
+| 6    | `20H`    | `00100000` | LED6 |
+| 7    | `40H`    | `01000000` | LED7 |
+| 8    | `80H`    | `10000000` | LED8 |
 
-Delay function
-void delay_ms(unsigned int ms)
+---
 
-This creates an approximate delay used for switch debouncing.
+##  Flowchart
 
-Mechanical switches can produce rapid unwanted transitions when pressed or released. The approximately 20 ms delay helps prevent these false transitions.
+```text
+             ┌─────────────┐
+             │    START    │
+             └──────┬──────┘
+                    │
+                    ▼
+          ┌──────────────────┐
+          │ Initialize Port 2│
+          └────────┬─────────┘
+                   │
+                   ▼
+          ┌──────────────────┐
+          │ Set LED Pattern  │
+          └────────┬─────────┘
+                   │
+                   ▼
+          Next LED   LED1
+               │       │
+               └───┬───┘
+                   │
+                   ▼
+                Repeat
+```
 
-Input configuration
-BUTTON = 1;
+---
 
-The P1.2 pin is placed in the appropriate state for input operation.
+##  Simulation
 
-Initial output
-BUZZER = 0;
+The circuit can be simulated in **Proteus** using the following procedure:
 
-The buzzer and speaker are initially switched OFF.
+1. Create the AT89C51 circuit.
+2. Connect eight LEDs to Port 2.
+3. Add 330 Ω resistors in series with the LEDs.
+4. Connect the crystal oscillator and capacitors.
+5. Add the reset and power supply connections.
+6. Write the Embedded C program in Keil µVision.
+7. Compile the program and generate the `.hex` file.
+8. Load the HEX file into the AT89C51 model in Proteus.
+9. Start the simulation.
+10. Observe the sequential LED operation.
 
-Continuous monitoring
-while (1)
+---
 
-The microcontroller continuously monitors the push button.
+##  Project Structure
 
-Button pressed
-if (BUTTON == 1)
+```text
+Eight-LED-Sequential-Lighting/
+│
+├── README.md
+│
+├── src/
+│   └── led_sequence.c
+│
+├── hex/
+│   └── led_sequence.hex
+│
+├── simulation/
+│   └── led_sequence.pdsprj
+│
+└── images/
+    ├── circuit.png
+    └── simulation.png
+```
+---
 
-If P1.2 is HIGH, the program assumes that the push button is pressed.
+##  Expected Output
 
-After the debounce delay, the button is checked again.
+The LEDs glow sequentially:
 
-BUZZER = 1;
+```text
+LED1 → LED2 → LED3 → LED4
+                      ↓
+LED8 ← LED7 ← LED6 ← LED5
+```
 
-P3.2 becomes HIGH, turning ON the BC547 and consequently the buzzer and speaker.
+The sequence repeats continuously.
 
-Button released
-else
-{
-    BUZZER = 0;
-}
+---
 
-When P1.2 is LOW, P3.2 is made LOW and the audible devices are switched OFF.
 
-11. Input-Output Table
-Push Button	P1.2	P3.2	BC547	Buzzer	Speaker
-Released	LOW	LOW	OFF	OFF	OFF
-Pressed	HIGH	HIGH	ON	ON	ON
 
-This corresponds to the expected output given in the repository.
+## Output
+<img width="1337" height="989" alt="WhatsApp Image 2026-09-24 at 1 48 32 PM" src="https://github.com/user-attachments/assets/54f36c91-7159-4857-801b-923e8f55eef0" />
 
-12. Procedure
-Collect all the required components.
-Connect the AT89C51 microcontroller to a regulated +5 V supply.
-Connect the required crystal oscillator circuit to XTAL1 and XTAL2.
-Connect the reset circuit to the RST pin.
-Connect one terminal of the push button to +5 V.
-Connect the other terminal of the push button to P1.2.
-Connect a 10 kΩ pull-down resistor between P1.2 and GND.
-Connect P3.2 to the base of the BC547 through a 330 Ω resistor.
-Connect the emitter of BC547 to GND.
-Connect the negative terminals of the buzzer and speaker to the collector of BC547.
-Connect the positive terminals of the buzzer and speaker to +5 V.
-Connect all grounds together.
-Write the Embedded C program in Keil.
-Compile the program and generate the required HEX file.
-Load the HEX file into the AT89C51 in the required hardware/simulation environment.
-Switch ON the +5 V supply.
-Initially verify that the buzzer and speaker remain OFF.
-Press the push button.
-Observe that the buzzer and speaker turn ON.
-Release the push button.
-Observe that the buzzer and speaker turn OFF.
-Record the observations.
-13. Observation
-S.No.	Push Button Status	P1.2	P3.2	Audible Output
-1	Released	LOW	LOW	Buzzer and speaker OFF
-2	Pressed	HIGH	HIGH	Buzzer and speaker ON
-3	Released	LOW	LOW	Buzzer and speaker OFF
-4	Pressed	HIGH	HIGH	Buzzer and speaker ON
-14. Expected Output
-When the push button is released
-P1.2 = LOW
-P3.2 = LOW
-BC547 = OFF
-Buzzer = OFF
-Speaker = OFF
-When the push button is pressed
-P1.2 = HIGH
-P3.2 = HIGH
-BC547 = ON
-Buzzer = ON
-Speaker = ON
 
-The repository specifies the same released/pressed relationship between P1.2, P3.2 and the audible devices.
+##  Applications
 
-15. Applications
-Security alarm systems.
-Emergency warning systems.
-Doorbell circuits.
-Industrial fault indicators.
-Vehicle alert systems.
-Patient assistance systems.
-Simple electronic alert systems.
-Push-button notification systems.
+This type of sequential lighting system can be used in:
 
-The first six applications are explicitly listed in the repository.
+* Decorative lighting systems
+* Indicator panels
+* Electronic displays
+* Signalling systems
+* Traffic-light demonstrations
+* Embedded-system prototypes
+* Microcontroller learning projects
 
-16. Advantages
-Simple circuit design.
-Low component count.
-Easy to implement using an 8051 microcontroller.
-Simple Embedded C program.
-Provides immediate audible feedback.
-Suitable for learning microcontroller GPIO interfacing.
-Can be extended for alarm and notification applications.
-17. Limitations
-The circuit provides only basic ON/OFF sound control.
-The basic program does not generate different musical tones.
-A separate transistor stage is used because the microcontroller should not directly drive a relatively higher-current load.
-Mechanical switch bouncing must be considered.
-A suitable clock circuit is required for normal AT89C51 operation.
-An inductive/magnetic buzzer may require a flyback diode for transistor protection.
-18. Precautions
-Use a regulated +5 V DC supply.
-Check the AT89C51 pin connections before powering the circuit.
-Ensure that VCC and GND are connected correctly.
-Use the correct resistor values.
-Ensure correct BC547 transistor pin identification.
-Do not connect a high-power speaker directly to the microcontroller pin.
-Use a transistor driver for the buzzer/speaker load.
-Ensure all devices have a common ground.
-Use the required crystal oscillator circuit for the AT89C51.
-For a magnetic/inductive buzzer, use a suitable flyback diode as recommended in the project documentation.
-19. Viva Questions and Answers
-1. What is the aim of this experiment?
+---
+##  Result
 
-To interface a push button, buzzer and speaker with the AT89C51 microcontroller and activate the audible devices when the push button is pressed.
-
-2. Which microcontroller is used?
-
-AT89C51, an 8051-family 8-bit microcontroller.
-
-3. Which pin is used for the push button?
-
-P1.2, pin 3.
-
-4. Which pin controls the buzzer and speaker?
-
-P3.2, pin 12.
-
-5. Why is a pull-down resistor used?
-
-The 10 kΩ pull-down resistor ensures that P1.2 remains at a defined LOW logic level when the push button is not pressed.
-
-6. What happens when the push button is pressed?
-
-P1.2 becomes HIGH, the microcontroller makes P3.2 HIGH, the BC547 turns ON, and the buzzer and speaker produce sound.
-
-7. What happens when the button is released?
-
-P1.2 becomes LOW, P3.2 becomes LOW, the BC547 turns OFF, and the buzzer and speaker stop.
-
-8. Why is BC547 used?
-
-It acts as a switching/driver transistor between the microcontroller output and the audible load.
-
-9. Why is a 330 Ω resistor used?
-
-It is connected between P3.2 and the transistor base to limit the base current.
-
-10. Why is a debounce delay required?
-
-Mechanical push buttons can generate rapid unwanted transitions during switching. A short delay helps prevent false triggering.
-
-11. What is the purpose of reg51.h?
-
-It provides definitions for the 8051 microcontroller registers and ports.
-
-12. What does sbit do?
-
-It allows an individual bit of an 8051 register to be given a meaningful name.
-
-13. What does sbit BUTTON = P1^2; mean?
-
-It assigns the name BUTTON to bit 2 of Port 1, i.e. P1.2.
-
-14. What does sbit BUZZER = P3^2; mean?
-
-It assigns the name BUZZER to P3.2.
-15. What is the output when P1.2 is LOW?
-P3.2 is LOW and the buzzer/speaker are OFF.
-16. What is the output when P1.2 is HIGH?
-P3.2 becomes HIGH and the buzzer/speaker are ON.
-20. Result
-
-The push button was successfully interfaced with the AT89C51 microcontroller. When the push button was pressed, the microcontroller activated the BC547 transistor, which switched ON the buzzer and speaker. When the push button was released, the buzzer and speaker were switched OFF successfully. Thus, the required push-button-controlled buzzer and speaker operation was achieved.
+The eight-LED sequential lighting system using the AT89C51 microcontroller** was successfully designed and implemented. The eight LEDs connected to Port 2 of the AT89C51 glowed **sequentially from LED1 to LED8 with a predefined time delay. The sequence was repeated continuously, producing a running-light effect.Thus, the required sequential LED lighting operation was successfully achieved and verified through simulation.
